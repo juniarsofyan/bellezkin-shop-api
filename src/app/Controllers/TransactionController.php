@@ -11,13 +11,15 @@ class TransactionController
     protected $ongkir;
     protected $renderer;
     protected $mailer;
+    protected $environment;
 
-    public function __construct($db, $ongkir, $renderer, $mailer)
+    public function __construct($db, $ongkir, $renderer, $mailer, $environment)
     {
         $this->db = $db;
         $this->ongkir = $ongkir;
         $this->renderer = $renderer;
         $this->mailer = $mailer;
+        $this->environment = $environment;
     }
 
     public function index(Request $request, Response $response)
@@ -60,6 +62,7 @@ class TransactionController
                                 "recipient" => $transaction['customer_email']
                             ),
                             "params" => array (
+                                "app_url" => $this->environment['app_url'],
                                 "name" => $transaction['customer_name'],
                                 "transaction_date" => $this->getLocalDateFormat(date('Y-m-d'), true),
                                 "transaction_number" => $transaction['transaction_number'],
@@ -391,6 +394,7 @@ class TransactionController
                         "recipient" => $customer['email']
                     ),
                     "params" => array (
+                        "app_url" => $this->environment['app_url'],
                         "name" => ucwords(strtolower($customer['nama'])),
                         "confirm_payment_date" => $date,
                         "transaction_number" => $transaction_number,
