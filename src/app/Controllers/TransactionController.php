@@ -120,7 +120,7 @@ class TransactionController
                         ) VALUE (
                             :tgl_transaksi,
                             :nomor_transaksi,
-                            (SELECT id FROM cn_customer WHERE email = :customer_email),
+                            (SELECT id FROM cn_customer WHERE email = :customer_email LIMIT 1),
                             :nama,
                             :metode_pengiriman,
                             :kurir,
