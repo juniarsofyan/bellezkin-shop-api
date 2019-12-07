@@ -50,8 +50,8 @@ class TransactionController
                     if ($substract_sales_branch_qty) {
 
                         $branch = $this->findBranch($transaction['sales_branch_code']);
-                        $profile = $this->findProfile($transaction['customer_email']);
-                        $shipping_address = $this->findShippingAddress($transaction['customer_email']);
+                        $profile = $this->findProfile($transaction['customer_id']);
+                        $shipping_address = $this->findShippingAddress($transaction['customer_id']);
                         $items = $this->findItems($transaction['transaction_number'], $transaction['cart']);
                         $bank = $this->findBank($transaction['bank']);
 
@@ -59,7 +59,7 @@ class TransactionController
                             "email" => array(
                                 "template" => "order-confirmed.php",
                                 "subject" => "Transaction Activity",
-                                "recipient" => $transaction['customer_email']
+                                "recipient" => $profile['email']
                             ),
                             "params" => array (
                                 "app_url" => $this->environment['app_url'],
@@ -120,7 +120,7 @@ class TransactionController
                         ) VALUE (
                             :tgl_transaksi,
                             :nomor_transaksi,
-                            (SELECT id FROM cn_customer WHERE email = :customer_email LIMIT 1),
+                            :customer_id,
                             :nama,
                             :metode_pengiriman,
                             :kurir,
@@ -141,7 +141,7 @@ class TransactionController
         $data = [
             ":tgl_transaksi"       => date('Y-m-d'),
             ":nomor_transaksi"     => $transaction["transaction_number"],
-            ":customer_email"         => $transaction["customer_email"],
+            ":customer_id"         => $transaction["customer_id"],
             ":nama"                => $transaction["customer_name"],
             ":metode_pengiriman"   => $transaction["shipping_method"],
             ":kurir"               => $transaction["courier"],
@@ -843,15 +843,15 @@ class TransactionController
         return $branch[$code];
     }
 
-    public function findProfile($email) 
+    public function findProfile($id) 
     {
-        $sql = "SELECT nama, telepon
+        $sql = "SELECT nama, telepon, email 
                 FROM cn_customer 
-                WHERE email=:email";
+                WHERE id=:id";
 
         $stmt = $this->db->prepare($sql);
 
-        $data = [":email" => $email];
+        $data = [":id" => $id];
 
         $stmt->execute($data);
 
@@ -860,19 +860,19 @@ class TransactionController
         }
     }
 
-    public function findShippingAddress($email) 
+    public function findShippingAddress($id) 
     {
         $sql = "SELECT nama, telepon, provinsi_nama, kota_nama, kecamatan_nama, alamat, kode_pos
                 FROM cn_shipping_address 
                 WHERE customer_id = (
                     SELECT id 
                     FROM cn_customer 
-                    WHERE email=:email
+                    WHERE id=:id
                 )";
 
         $stmt = $this->db->prepare($sql);
 
-        $data = [":email" => $email];
+        $data = [":id" => $id];
 
         $stmt->execute($data);
 
