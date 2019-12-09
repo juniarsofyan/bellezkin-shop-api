@@ -274,7 +274,7 @@ class TransactionController
                                     ON cst.id = trs.customer_id
                                 INNER JOIN cn_order_history odh
                                     ON odh.transaksi_id = trs.id
-                                WHERE cst.email=:email
+                                WHERE cst.email=:email AND trs.jenis_platform = 'SHOP' 
                                 GROUP by (transaksi_id)
                                 ORDER BY trs.tgl_transaksi DESC, trs.id DESC";
 
@@ -299,7 +299,9 @@ class TransactionController
                                     WHERE 
                                         cst.email=:email
                                         AND
-                                        odh.transaksi_id = trs.id
+                                        odh.transaksi_id = trs.id 
+                                        AND 
+                                        trs.jenis_platform = 'SHOP' 
                                     ORDER BY 
                                         trs.tgl_transaksi DESC, 
                                         odh.transaksi_id DESC, 
@@ -327,7 +329,8 @@ class TransactionController
                                 ON cst.id = trs.customer_id
                             WHERE 
                                 cst.email=:email
-                                and trd.transaksi_id in (SELECT transaksi_id FROM cn_order_history)
+                                AND trd.transaksi_id in (SELECT transaksi_id FROM cn_order_history) 
+                                AND trs.jenis_platform = 'SHOP' 
                                 order by trs.id";
 
                     $stmt = $this->db->prepare($sql_items);
