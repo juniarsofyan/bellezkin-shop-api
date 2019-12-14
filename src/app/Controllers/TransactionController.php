@@ -198,6 +198,7 @@ class TransactionController
                     qty,
                     subtotal,
                     total_vc,
+                    total_poin,
                     note,
                     promo
                 ) VALUE (
@@ -207,6 +208,7 @@ class TransactionController
                     :qty,
                     :subtotal,
                     :total_vc,
+                    :total_poin,
                     :note,
                     :promo
                 )";
@@ -222,6 +224,7 @@ class TransactionController
                 ":qty"          => (int) $item["qty"],
                 ":subtotal"     => (int) $item["grand_total"], // GRAND TOTAL AFTER DISCOUNTED
                 ":total_vc"     => (isset($item["price_bonus_calculation"]) ? (int) $item["price_bonus_calculation"] * (int) $item["qty"] : 0),
+                ":total_poin"     => (isset($item["poin"]) ? (int) $item["poin"] * (int) $item["qty"] : 0),
                 ":note"         => (isset($item["note"]) ? $item["note"] : ""),
                 ":promo"         => (isset($item["promo"]) ? $item["promo"] : 0),
             ];
