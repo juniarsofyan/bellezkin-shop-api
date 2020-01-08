@@ -154,9 +154,9 @@ class ShippingAddressController
 
             $result = $stmt->fetch();
 
-            if ($result['count_shipping_address'] < 2) {
+            /* if ($result['count_shipping_address'] < 2) {
                 $this->setDefault($request, $response, array('id' => $last_insert_id));
-            }
+            } */
 
             return $response->withJson(["status" => "success", "data" => "1"], 200);
         }
@@ -220,15 +220,17 @@ class ShippingAddressController
         return $response->withJson(["status" => "failed", "data" => "0"], 200);
     }
 
-    public function setDefault(Request $request, Response $response, array $args)
+    public function setDefault(Request $request, Response $response)
     {
+        $shipping_address = $request->getParsedBody();
+
         $sql1 = "UPDATE cn_shipping_address 
                 SET is_default=0
                 WHERE id NOT IN(:id)";
 
         $stmt1 = $this->db->prepare($sql1);
 
-        $params1 = [":id" => $args['id']];
+        $params1 = [":id" => $shipping_address['id']];
 
         if ($stmt1->execute($params1)) {
 
@@ -238,7 +240,7 @@ class ShippingAddressController
 
             $stmt2 = $this->db->prepare($sql2);
 
-            $params2 = [":id" => $args['id']];
+            $params2 = [":id" => $shipping_address['id']];
 
             if ($stmt2->execute($params2)) {
                 return $response->withJson(["status" => "success", "data" => "1"], 200);
